@@ -18,15 +18,14 @@ class UserControllerTest extends TestCase
             'email' => 'john.doe@example.com',
         ]);
 
-        $this->json('GET', 'api/users/find', ['query' => 'johndoe'])
-             ->seeJson($user->toArray());
+        $successPseudo = $this->call('GET', 'api/users/find', ['query' => 'johndoe']);
+        $successEmail = $this->call('GET', 'api/users/find', ['query' => 'john.doe@example.com']);
+        $failure = $this->call('GET', 'api/users/find', ['query' => 'janedoe']);
 
-        $this->json('GET', 'api/users/find', ['query' => 'john.doe@example.com'])
-             ->seeJson($user->toArray());
-
-        $this->assertEquals(
-            404,
-            $this->call('GET', 'api/users/find', ['query' => 'janedoe'])->status()
-        );
+        $this->assertEquals(200, $successPseudo->status());
+        $this->assertEquals((string) $user, $successPseudo->content());
+        $this->assertEquals(200, $successEmail->status());
+        $this->assertEquals((string) $user, $successEmail->content());
+        $this->assertEquals(404, $failure->status());
     }
 }
