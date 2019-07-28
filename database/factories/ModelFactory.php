@@ -13,9 +13,9 @@
 
 $factory->define(App\User::class, function (Faker\Generator $faker) {
     return [
-        'pseudo' => $faker->bothify('???????##'),
+        'pseudo' => $faker->username,
         'name' => $faker->name,
         'email' => $faker->email,
-        'password' => $faker->password,
+        'password' => app('hash')->make($faker->password),
     ];
 });

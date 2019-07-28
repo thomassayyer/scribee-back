@@ -18,5 +18,9 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'users'], function () use ($router) {
         $router->get('find', 'UserController@find');
+        $router->get('{pseudo}', 'UserController@show');
+        $router->post('login', 'UserController@login');
+        $router->post('/', 'UserController@register');
+        $router->delete('logout', 'UserController@logout');
     });
 });
