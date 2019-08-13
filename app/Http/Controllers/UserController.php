@@ -16,7 +16,11 @@ class UserController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth', ['only' => ['show']]);
+        $this->middleware('auth', [
+            'except' => [
+                'find', 'create', 'updateToken'
+            ]
+        ]);
     }
 
     /**
@@ -56,12 +60,23 @@ class UserController extends Controller
     }
 
     /**
-     * Verify the credentials and display the token to use.
+     * Display the current user (the user who's made the request).
      * 
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function login(Request $request)
+    public function showCurrent(Request $request)
+    {
+        return $request->user();
+    }
+
+    /**
+     * Verify the credentials then update and display the token to use.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateToken(Request $request)
     {
         $user = User::find($request->input('login'));
 
@@ -77,12 +92,12 @@ class UserController extends Controller
     }
 
     /**
-     * Register a new user.
+     * Create a new user.
      * 
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function register(Request $request)
+    public function create(Request $request)
     {
         $this->validate($request, [
             'pseudo' => 'required|string|unique:users,pseudo',
@@ -95,7 +110,7 @@ class UserController extends Controller
         $user->password = Hash::make($request->input('password'));
         $user->save();
 
-        return $user;
+        return response($user, 201);
     }
 
     /**
@@ -104,7 +119,7 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function logout(Request $request)
+    public function destroyToken(Request $request)
     {
         $request->user()->api_token = null;
         $request->user()->save();

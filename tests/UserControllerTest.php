@@ -48,26 +48,26 @@ class UserControllerTest extends TestCase
     }
 
     /**
-     * Test the behavior of performing a POST HTTP request to /api/users/login.
+     * Test the behavior of performing a PATCH HTTP request to /api/users/token.
      *
      * @return void
      */
-    public function testLogin()
+    public function testUpdateToken()
     {
         $user = factory(App\User::class)->create([
             'pseudo' => 'johndoe',
             'password' => Hash::make('password'),
         ]);
 
-        $wrongPseudo = $this->call('POST', 'api/users/login', [
+        $wrongPseudo = $this->call('PATCH', 'api/users/token', [
             'login' => 'janedoe',
             'password' => 'password',
         ]);
-        $wrongPassword = $this->call('POST', 'api/users/login', [
+        $wrongPassword = $this->call('PATCH', 'api/users/token', [
             'login' => 'janedoe',
             'password' => 'secret',
         ]);
-        $success = $this->call('POST', 'api/users/login', [
+        $success = $this->call('PATCH', 'api/users/token', [
             'login' => 'johndoe',
             'password' => 'password',
         ]);
@@ -76,5 +76,102 @@ class UserControllerTest extends TestCase
         $this->assertEquals(422, $wrongPassword->status());
         $this->assertEquals(200, $success->status());
         $this->seeInDatabase('users', ['api_token' => json_decode($success->content())->api_token]);
+    }
+
+    /**
+     * Test the behavior of performing a POST HTTP request to /api/users.
+     *
+     * @return void
+     */
+    public function testCreate()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+        ]);
+
+        $existingPseudo = $this->call('POST', 'api/users', [
+            'pseudo' => 'johndoe',
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 'Password33',
+        ]);
+
+        $wrongEmail = $this->call('POST', 'api/users', [
+            'pseudo' => 'janedoe',
+            'name' => 'Jane Doe',
+            'email' => 'jane.doe',
+            'password' => 'Password33',
+        ]);
+
+        $existingEmail = $this->call('POST', 'api/users', [
+            'pseudo' => 'janedoe',
+            'name' => 'Jane Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 'Password33',
+        ]);
+
+        $wrongPassword = $this->call('POST', 'api/users', [
+            'pseudo' => 'janedoe',
+            'name' => 'Jane Doe',
+            'email' => 'jane.doe@example.com',
+            'password' => 'passwd',
+        ]);
+
+        $success = $this->call('POST', 'api/users', [
+            'pseudo' => 'janedoe',
+            'name' => 'Jane Doe',
+            'email' => 'jane.doe@example.com',
+            'password' => 'Password33',
+        ]);
+
+        
+        $this->assertEquals(422, $existingPseudo->status());
+        $this->assertEquals(422, $wrongEmail->status());
+        $this->assertEquals(422, $existingEmail->status());
+        $this->assertEquals(422, $wrongPassword->status());
+        $this->assertEquals(201, $success->status());
+        $this->seeInDatabase('users', [
+            'pseudo' => 'janedoe',
+            'name' => 'Jane Doe',
+            'email' => 'jane.doe@example.com',
+        ]);
+    }
+
+    /**
+     * Test the behavior of performing a DELETE HTTP request to /api/users/token.
+     *
+     * @return void
+     */
+    public function testDestroyToken()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+            'api_token' => 'token',
+        ]);
+
+        $response = $this->actingAs($user)->call('DELETE', 'api/users/token');
+
+        $this->assertEquals(200, $response->status());
+        $this->seeInDatabase('users', [
+            'pseudo' => 'johndoe',
+            'api_token' => null,
+        ]);
+    }
+
+    /**
+     * Test the behavior of performing a GET HTTP request to /api/users/current.
+     *
+     * @return void
+     */
+    public function testShowCurrent()
+    {
+        $user = factory(App\User::class)->create();
+
+        $response = $this->actingAs($user)->call('GET', 'api/users/current');
+
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals($user->toJson(), $response->content());
     }
 }

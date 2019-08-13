@@ -26,7 +26,7 @@ class HandleCors
      */
     public function handle($request, Closure $next)
     {
-        $response = $request->isMethod('OPTIONS') ? response('Ok', 200) : $next($request);
+        $response = $request->isMethod('OPTIONS') ? response('OK', 200) : $next($request);
 
         foreach ($this->headers as $key => $value) {
             $response->header($key, implode(',', $value));
