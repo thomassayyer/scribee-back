@@ -18,7 +18,7 @@ class UserController extends Controller
     {
         $this->middleware('auth', [
             'except' => [
-                'find', 'create', 'updateToken'
+                'find', 'create', 'createToken'
             ]
         ]);
     }
@@ -71,12 +71,12 @@ class UserController extends Controller
     }
 
     /**
-     * Verify the credentials then update and display the token to use.
+     * Verify the credentials then create and display the token to use.
      * 
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function updateToken(Request $request)
+    public function createToken(Request $request)
     {
         $user = User::find($request->input('login'));
 
@@ -100,7 +100,7 @@ class UserController extends Controller
     public function create(Request $request)
     {
         $this->validate($request, [
-            'pseudo' => 'required|string|unique:users,pseudo',
+            'pseudo' => 'required|string|unique:users,pseudo|max:15',
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',

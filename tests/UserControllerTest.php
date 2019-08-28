@@ -37,37 +37,38 @@ class UserControllerTest extends TestCase
      */
     public function testShow()
     {
-        $user = factory(App\User::class)->create([
+        $actingUser = factory(App\User::class)->create();
+        $userToShow = factory(App\User::class)->create([
             'pseudo' => 'johndoe'
         ]);
 
-        $response = $this->call('GET', 'api/users/johndoe');
+        $response = $this->actingAs($actingUser)->call('GET', 'api/users/johndoe');
 
         $this->assertEquals(200, $response->status());
-        $this->assertEquals($user->toJson(), $response->content());
+        $this->assertEquals($userToShow->toJson(), $response->content());
     }
 
     /**
-     * Test the behavior of performing a PATCH HTTP request to /api/users/token.
+     * Test the behavior of performing a POST HTTP request to /api/users/token.
      *
      * @return void
      */
-    public function testUpdateToken()
+    public function testCreateToken()
     {
         $user = factory(App\User::class)->create([
             'pseudo' => 'johndoe',
             'password' => Hash::make('password'),
         ]);
 
-        $wrongPseudo = $this->call('PATCH', 'api/users/token', [
+        $wrongPseudo = $this->call('POST', 'api/users/token', [
             'login' => 'janedoe',
             'password' => 'password',
         ]);
-        $wrongPassword = $this->call('PATCH', 'api/users/token', [
+        $wrongPassword = $this->call('POST', 'api/users/token', [
             'login' => 'janedoe',
             'password' => 'secret',
         ]);
-        $success = $this->call('PATCH', 'api/users/token', [
+        $success = $this->call('POST', 'api/users/token', [
             'login' => 'johndoe',
             'password' => 'password',
         ]);
@@ -93,6 +94,13 @@ class UserControllerTest extends TestCase
 
         $existingPseudo = $this->call('POST', 'api/users', [
             'pseudo' => 'johndoe',
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'password' => 'Password33',
+        ]);
+
+        $wrongPseudo = $this->call('POST', 'api/users', [
+            'pseudo' => 'johndoe78928123',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'password' => 'Password33',
@@ -128,6 +136,7 @@ class UserControllerTest extends TestCase
 
         
         $this->assertEquals(422, $existingPseudo->status());
+        $this->assertEquals(422, $wrongPseudo->status());
         $this->assertEquals(422, $wrongEmail->status());
         $this->assertEquals(422, $existingEmail->status());
         $this->assertEquals(422, $wrongPassword->status());

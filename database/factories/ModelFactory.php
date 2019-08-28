@@ -19,3 +19,12 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'password' => app('hash')->make($faker->password),
     ];
 });
+
+$factory->define(App\Community::class, function (Faker\Generator $faker) {
+    return [
+        'pseudo' => $faker->username,
+        'name' => $faker->company,
+        'description' => $faker->text,
+        'user_pseudo' => factory(App\User::class)->create()->pseudo,
+    ];
+});

@@ -57,4 +57,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password', 'api_token'
     ];
+
+    /**
+     * The communities that belong to the user.
+     */
+    public function communities()
+    {
+        return $this->hasMany(Community::class, 'owner_pseudo');
+    }
 }
