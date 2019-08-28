@@ -16,11 +16,11 @@ class CreateTextsTable extends Migration
         Schema::create('texts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->text('text');
-            $table->string('user_pseudo');
             $table->string('community_pseudo');
+            $table->string('user_pseudo');
             $table->timestamps();
-            $table->foreign('user_pseudo')->references('pseudo')->on('users');
             $table->foreign('community_pseudo')->references('pseudo')->on('communities');
+            $table->foreign('user_pseudo')->references('pseudo')->on('users');
         });
     }
 

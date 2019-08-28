@@ -27,4 +27,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'communities'], function () use ($router) {
         $router->get('search', 'CommunityController@search');
     });
+    $router->group(['prefix' => 'texts'], function () use ($router) {
+        $router->post('/', 'TextController@create');
+    });
 });
