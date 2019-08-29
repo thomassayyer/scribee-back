@@ -119,8 +119,8 @@ class UserController extends Controller
     public function updateCurrent(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
+            'name' => 'string',
+            'email' => 'email|unique:users,email',
             'new_password' => 'required_with:oldPassword|string|min:8',
         ]);
 
@@ -132,8 +132,14 @@ class UserController extends Controller
             }
         }
 
-        $request->user()->name = $request->input('name');
-        $request->user()->email = $request->input('email');
+        if ($request->has('name')) {
+            $request->user()->name = $request->input('name');
+        }
+
+        if ($request->has('email')) {
+            $request->user()->email = $request->input('email');
+        }
+
         $request->user()->password = Hash::make($request->input('new_password'));
         $request->user()->save();
 

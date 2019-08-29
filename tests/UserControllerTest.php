@@ -186,33 +186,24 @@ class UserControllerTest extends TestCase
 
         $user->makeVisible('password');
 
-        $guestFailure = $this->call('PATCH', 'api/users/current', [
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
-        ]);
+        $guestFailure = $this->call('PATCH', 'api/users/current');
 
         $this->actingAs($user);
 
         $wrongEmail = $this->call('PATCH', 'api/users/current', [
-            'name' => 'John Doe',
             'email' => 'john.doe',
         ]);
 
         $existingEmail = $this->call('PATCH', 'api/users/current', [
-            'name' => 'John Doe',
             'email' => 'jane.doe@example.com',
         ]);
 
         $wrongOldPassword = $this->call('PATCH', 'api/users/current', [
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
             'old_password' => 'password',
             'new_password' => 'Password33',
         ]);
 
         $wrongNewPassword = $this->call('PATCH', 'api/users/current', [
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
             'old_password' => 'secret',
             'new_password' => 'passwd',
         ]);
