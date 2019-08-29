@@ -31,24 +31,6 @@ class UserControllerTest extends TestCase
     }
 
     /**
-     * Test the behavior of performing a GET HTTP request to /api/users/{user}.
-     *
-     * @return void
-     */
-    public function testShow()
-    {
-        $actingUser = factory(App\User::class)->create();
-        $userToShow = factory(App\User::class)->create([
-            'pseudo' => 'johndoe'
-        ]);
-
-        $response = $this->actingAs($actingUser)->call('GET', 'api/users/johndoe');
-
-        $this->assertEquals(200, $response->status());
-        $this->assertEquals($userToShow->toJson(), $response->content());
-    }
-
-    /**
      * Test the behavior of performing a POST HTTP request to /api/users/token.
      *
      * @return void
@@ -182,5 +164,77 @@ class UserControllerTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertEquals($user->toJson(), $response->content());
+    }
+
+    /**
+     * Test the behavior of performing a PATCH HTTP request to /api/users/current.
+     * 
+     * @return void
+     */
+    public function testUpdateCurrent()
+    {
+        factory(App\User::class)->create([
+            'email' => 'jane.doe@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'password' => Hash::make('secret'),
+        ]);
+
+        $user->makeVisible('password');
+
+        $guestFailure = $this->call('PATCH', 'api/users/current', [
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+        ]);
+
+        $this->actingAs($user);
+
+        $wrongEmail = $this->call('PATCH', 'api/users/current', [
+            'name' => 'John Doe',
+            'email' => 'john.doe',
+        ]);
+
+        $existingEmail = $this->call('PATCH', 'api/users/current', [
+            'name' => 'John Doe',
+            'email' => 'jane.doe@example.com',
+        ]);
+
+        $wrongOldPassword = $this->call('PATCH', 'api/users/current', [
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'old_password' => 'password',
+            'new_password' => 'Password33',
+        ]);
+
+        $wrongNewPassword = $this->call('PATCH', 'api/users/current', [
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'old_password' => 'secret',
+            'new_password' => 'passwd',
+        ]);
+
+        $success = $this->call('PATCH', 'api/users/current', [
+            'name' => 'David Doe',
+            'email' => 'david.doe@example.com',
+            'old_password' => 'secret',
+            'new_password' => 'Password33',
+        ]);
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(422, $wrongEmail->status());
+        $this->assertEquals(422, $existingEmail->status());
+        $this->assertEquals(422, $wrongOldPassword->status());
+        $this->assertEquals(422, $wrongNewPassword->status());
+        $this->assertEquals(200, $success->status());
+        $this->seeInDatabase('users', [
+            'pseudo' => 'johndoe',
+            'name' => 'David Doe',
+            'email' => 'david.doe@example.com',
+        ]);
+        $this->assertTrue(Hash::check('Password33', json_decode($success->content())->password));
     }
 }

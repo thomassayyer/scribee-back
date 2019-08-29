@@ -19,10 +19,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'users'], function () use ($router) {
         $router->get('find', 'UserController@find');
         $router->get('current', 'UserController@showCurrent');
-        $router->get('{pseudo}', 'UserController@show');
         $router->post('token', 'UserController@createToken');
         $router->post('/', 'UserController@create');
         $router->delete('token', 'UserController@destroyToken');
+        $router->patch('current', 'UserController@updateCurrent');
     });
     $router->group(['prefix' => 'communities'], function () use ($router) {
         $router->get('search', 'CommunityController@search');

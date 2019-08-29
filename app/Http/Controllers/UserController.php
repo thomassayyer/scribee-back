@@ -27,7 +27,7 @@ class UserController extends Controller
      * Find a user by pseudo or email.
      * 
      * @param  \Illuminate\Http\Request  $request
-     * @return \App\User
+     * @return \Illuminate\Http\Response
      */
     public function find(Request $request)
     {
@@ -35,23 +35,6 @@ class UserController extends Controller
                     ->orWhere('email', $request->get('query'))
                     ->first();
         
-        if (!$user) {
-            return response('User not found!', 404);
-        }
-    
-        return $user;
-    }
-
-    /**
-     * Display the specified user.
-     *
-     * @param  string  $pseudo
-     * @return \App\User|\Illuminate\Http\Response
-     */
-    public function show($pseudo)
-    {
-        $user = User::find($pseudo);
-
         if (!$user) {
             return response('User not found!', 404);
         }
@@ -125,5 +108,35 @@ class UserController extends Controller
         $request->user()->save();
 
         return response('API Token destroyed!');
+    }
+
+    /**
+     * Update the current user.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateCurrent(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'new_password' => 'required_with:oldPassword|string|min:8',
+        ]);
+
+        if ($request->has('old_password')) {
+            if (!Hash::check($request->input('old_password'), $request->user()->password)) {
+                return response()->json([
+                    'old_password' => [ 'Wrong password!' ]
+                ], 422);
+            }
+        }
+
+        $request->user()->name = $request->input('name');
+        $request->user()->email = $request->input('email');
+        $request->user()->password = Hash::make($request->input('new_password'));
+        $request->user()->save();
+
+        return $request->user();
     }
 }

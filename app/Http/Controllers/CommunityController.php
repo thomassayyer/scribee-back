@@ -21,7 +21,7 @@ class CommunityController extends Controller
      * Search for one or more communities by pseudo or name.
      * 
      * @param  \Illuminate\Http\Request  $request
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Http\Response
      */
     public function search(Request $request)
     {
