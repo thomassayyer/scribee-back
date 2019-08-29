@@ -21,7 +21,7 @@ class CreateSuggestionsTable extends Migration
             $table->boolean('accepted');
             $table->unsignedBigInteger('review_id');
             $table->timestamps();
-            $table->foreign('review_id')->references('id')->on('reviews');
+            $table->foreign('review_id')->references('id')->on('reviews')->onDelete('cascade');
         });
     }
 

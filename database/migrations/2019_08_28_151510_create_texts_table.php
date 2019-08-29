@@ -19,8 +19,8 @@ class CreateTextsTable extends Migration
             $table->string('community_pseudo');
             $table->string('user_pseudo');
             $table->timestamps();
-            $table->foreign('community_pseudo')->references('pseudo')->on('communities');
-            $table->foreign('user_pseudo')->references('pseudo')->on('users');
+            $table->foreign('community_pseudo')->references('pseudo')->on('communities')->onDelete('cascade');
+            $table->foreign('user_pseudo')->references('pseudo')->on('users')->onDelete('cascade');
         });
     }
 

@@ -18,7 +18,7 @@ class CreateCommunitiesTable extends Migration
             $table->string('name');
             $table->text('description');
             $table->string('user_pseudo');
-            $table->foreign('user_pseudo')->references('pseudo')->on('users');
+            $table->foreign('user_pseudo')->references('pseudo')->on('users')->onDelete('cascade');
         });
     }
 

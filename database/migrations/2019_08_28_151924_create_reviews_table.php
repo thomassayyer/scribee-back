@@ -19,8 +19,8 @@ class CreateReviewsTable extends Migration
             $table->string('user_pseudo');
             $table->unsignedBigInteger('text_id');
             $table->timestamps();
-            $table->foreign('user_pseudo')->references('pseudo')->on('users');
-            $table->foreign('text_id')->references('id')->on('texts');
+            $table->foreign('user_pseudo')->references('pseudo')->on('users')->onDelete('cascade');
+            $table->foreign('text_id')->references('id')->on('texts')->onDelete('cascade');
         });
     }
 
