@@ -111,7 +111,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update the current user.
+     * Update the currently authenticated user.
      * 
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -140,9 +140,29 @@ class UserController extends Controller
             $request->user()->email = $request->input('email');
         }
 
-        $request->user()->password = Hash::make($request->input('new_password'));
+        if ($request->has('new_password')) {
+            $request->user()->password = Hash::make($request->input('new_password'));
+        }
+
         $request->user()->save();
 
         return $request->user();
+    }
+
+    /**
+     * Destroy the currently authenticated user.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyCurrent(Request $request)
+    {
+        if (!Hash::check($request->input('password'), $request->user()->password)) {
+            return response()->json([
+                'password' => [ 'Wrong password!' ]
+            ], 400);
+        }
+
+        $request->user()->delete();
     }
 }

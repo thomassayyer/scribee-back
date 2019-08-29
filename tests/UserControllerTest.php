@@ -228,4 +228,35 @@ class UserControllerTest extends TestCase
         ]);
         $this->assertTrue(Hash::check('Password33', json_decode($success->content())->password));
     }
+
+    /**
+     * Test the behavior of performing a DELETE HTTP request to /api/users/current.
+     * 
+     * @return void
+     */
+    public function testDestroyCurrent()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+            'password' => Hash::make('secret'),
+        ]);
+
+        $guestFailure = $this->call('DELETE', 'api/users/current', [
+            'password' => 'secret'
+        ]);
+
+        $this->actingAs($user);
+
+        $wrongPassword = $this->call('DELETE', 'api/users/current', [
+            'password' => 'password'
+        ]);
+
+        $success = $this->call('DELETE', 'api/users/current', [
+            'password' => 'secret'
+        ]);
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(400, $wrongPassword->status());
+        $this->assertEquals(200, $success->status());
+    }
 }
