@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Support\Str;
 
 class CommunityControllerTest extends TestCase
 {
@@ -20,7 +21,10 @@ class CommunityControllerTest extends TestCase
         ]);
         factory(App\Community::class, 10)->create([
             'name' => 'Doro',
-        ]);
+        ])->each(function ($c) {
+            $c->pseudo = 'i'.$c->pseudo;
+            $c->save();
+        });
 
         $guestFailure = $this->call('GET', 'api/communities/search', ['query' => 'lor']);
 
@@ -38,5 +42,63 @@ class CommunityControllerTest extends TestCase
         $this->assertEquals(5, count(json_decode($successMultiple->content())));
         $this->assertEquals(404, $failure->status());
         $this->assertEquals(401, $guestFailure->status());
+    }
+
+    /**
+     * Test the behavior of performing a POST HTTP request to /api/communities.
+     *
+     * @return void
+     */
+    public function testCreate()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class)->create([
+            'pseudo' => 'lorem',
+        ]);
+
+        $guestFailure = $this->call('POST', 'api/communities', [
+            'pseudo' => 'ipsum',
+            'name' => 'Lorem ipsum',
+            'description' => 'Lorem ipsum dolor sit amet.',
+        ]);
+
+        $this->actingAs($user);
+
+        $wrongPseudo = $this->call('POST', 'api/communities', [
+            'pseudo' => Str::random(20),
+            'name' => 'Lorem ipsum',
+            'description' => 'Lorem ipsum dolor sit amet.',
+        ]);
+
+        $existingPseudo = $this->call('POST', 'api/communities', [
+            'pseudo' => 'lorem',
+            'name' => 'Lorem ipsum',
+            'description' => 'Lorem ipsum dolor sit amet.',
+        ]);
+
+        $wrongDescription = $this->call('POST', 'api/communities', [
+            'pseudo' => 'ipsum',
+            'name' => 'Lorem ipsum',
+            'description' => Str::random(50000),
+        ]);
+
+        $success = $this->call('POST', 'api/communities', [
+            'pseudo' => 'ipsum',
+            'name' => 'Lorem ipsum',
+            'description' => 'Lorem ipsum dolor sit amet.',
+        ]);
+        
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(422, $wrongPseudo->status());
+        $this->assertEquals(422, $existingPseudo->status());
+        $this->assertEquals(422, $wrongDescription->status());
+        $this->assertEquals(201, $success->status());
+        $this->seeInDatabase('communities', [
+            'pseudo' => 'ipsum',
+            'name' => 'Lorem ipsum',
+            'description' => 'Lorem ipsum dolor sit amet.',
+        ]);
     }
 }

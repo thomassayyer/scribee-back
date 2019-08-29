@@ -27,7 +27,7 @@ class TextController extends Controller
     {
         $this->validate($request, [
             'text' => 'required|string|max:40000',
-            'community_pseudo' => 'required|string|exists:communities,pseudo'
+            'community_pseudo' => 'required|string|exists:communities,pseudo',
         ]);
 
         $text = new Text($request->all());

@@ -25,7 +25,7 @@ class CommunityController extends Controller
      */
     public function search(Request $request)
     {
-        $query = '%' . $request->get('query') . '%';
+        $query = $request->get('query') . '%';
 
         $communities = Community::where('pseudo', 'like', $query)
                                 ->orWhere('name', 'like', $query)
@@ -37,5 +37,26 @@ class CommunityController extends Controller
         }
     
         return $communities;
+    }
+
+    /**
+     * Create a new community.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function create(Request $request)
+    {
+        $this->validate($request, [
+            'pseudo' => 'required|string|unique:communities,pseudo|max:15',
+            'name' => 'required|string',
+            'description' => 'required|string|max:40000',
+        ]);
+
+        $community = new Community($request->all());
+        $community->user_pseudo = $request->user()->pseudo;
+        $community->save();
+
+        return response($community, 201);
     }
 }
