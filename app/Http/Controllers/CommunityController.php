@@ -29,6 +29,7 @@ class CommunityController extends Controller
 
         $communities = Community::where('pseudo', 'like', $query)
                                 ->orWhere('name', 'like', $query)
+                                ->take(5)
                                 ->get();
         
         if ($communities->isEmpty()) {
