@@ -18,6 +18,17 @@ class CommunityController extends Controller
     }
 
     /**
+     * Display the communities of an authenticated user.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        return $request->user()->communities;
+    }
+
+    /**
      * Search for one or more communities by pseudo or name.
      * 
      * @param  \Illuminate\Http\Request  $request

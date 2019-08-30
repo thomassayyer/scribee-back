@@ -18,6 +18,17 @@ class TextController extends Controller
     }
 
     /**
+     * Display the texts of an authenticated user.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        return $request->user()->texts;
+    }
+
+    /**
      * Create a new text.
      * 
      * @param  \Illuminate\Http\Request  $request

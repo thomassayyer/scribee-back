@@ -111,7 +111,7 @@ class UserController extends Controller
     }
 
     /**
-     * Update the currently authenticated user.
+     * Update an authenticated user.
      * 
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -150,7 +150,7 @@ class UserController extends Controller
     }
 
     /**
-     * Destroy the currently authenticated user.
+     * Destroy an authenticated user.
      * 
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response

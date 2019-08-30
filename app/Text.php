@@ -14,4 +14,29 @@ class Text extends Model
     protected $fillable = [
         'text', 'community_pseudo'
     ];
+
+    /**
+     * The relations to eager load on every query.
+     *
+     * @var array
+     */
+    protected $with = [
+        'user', 'community'
+    ];
+
+    /**
+     * The author of the text.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * The community of the text.
+     */
+    public function community()
+    {
+        return $this->belongsTo(Community::class);
+    }
 }

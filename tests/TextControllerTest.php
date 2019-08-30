@@ -8,6 +8,29 @@ class TextControllerTest extends TestCase
     use DatabaseMigrations;
 
     /**
+     * Test the behavior of performing a GET HTTP request to /api/texts.
+     *
+     * @return void
+     */
+    public function testIndex()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        $texts = factory(App\Text::class, 5)->create([
+            'user_pseudo' => 'johndoe',
+        ]);
+        factory(App\Text::class, 5)->create();
+
+        $guestFailure = $this->call('GET', 'api/texts');
+        $success = $this->actingAs($user)->call('GET', 'api/texts');
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
+        $this->assertEquals(5, count(json_decode($success->content())));
+    }
+
+    /**
      * Test the behavior of performing a POST HTTP request to /api/texts.
      *
      * @return void

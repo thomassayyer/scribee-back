@@ -28,8 +28,13 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'communities'], function () use ($router) {
         $router->get('search', 'CommunityController@search');
         $router->post('/', 'CommunityController@create');
+        $router->get('/', 'CommunityController@index');
     });
     $router->group(['prefix' => 'texts'], function () use ($router) {
+        $router->get('/', 'TextController@index');
         $router->post('/', 'TextController@create');
+    });
+    $router->group(['prefix' => 'reviews'], function () use ($router) {
+        //
     });
 });

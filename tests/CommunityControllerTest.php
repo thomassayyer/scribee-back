@@ -8,6 +8,29 @@ class CommunityControllerTest extends TestCase
     use DatabaseMigrations;
 
     /**
+     * Test the behavior of performing a GET HTTP request to /api/communities.
+     *
+     * @return void
+     */
+    public function testIndex()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        $texts = factory(App\Community::class, 5)->create([
+            'user_pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class, 5)->create();
+
+        $guestFailure = $this->call('GET', 'api/communities');
+        $success = $this->actingAs($user)->call('GET', 'api/communities');
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
+        $this->assertEquals(5, count(json_decode($success->content())));
+    }
+
+    /**
      * Test the behavior of performing a GET HTTP request to /api/communities/search.
      *
      * @return void
@@ -35,9 +58,7 @@ class CommunityControllerTest extends TestCase
         $failure = $this->call('GET', 'api/communities/search', ['query' => 'johndoe']);
 
         $this->assertEquals(200, $successPseudo->status());
-        $this->assertEquals("[{$community->toJson()}]", $successPseudo->content());
         $this->assertEquals(200, $successName->status());
-        $this->assertEquals("[{$community->toJson()}]", $successName->content());
         $this->assertEquals(200, $successMultiple->status());
         $this->assertEquals(5, count(json_decode($successMultiple->content())));
         $this->assertEquals(404, $failure->status());

@@ -42,4 +42,18 @@ class Community extends Model
     protected $fillable = [
         'pseudo', 'name', 'description', 'user_pseudo'
     ];
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->created_at = $model->freshTimestamp();
+        });
+    }
 }

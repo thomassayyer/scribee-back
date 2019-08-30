@@ -63,6 +63,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function communities()
     {
-        return $this->hasMany(Community::class, 'owner_pseudo');
+        return $this->hasMany(Community::class);
+    }
+
+    /**
+     * The texts written by the user.
+     */
+    public function texts()
+    {
+        return $this->hasMany(Text::class);
     }
 }

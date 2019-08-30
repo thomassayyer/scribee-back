@@ -24,9 +24,7 @@ class UserControllerTest extends TestCase
         $failure = $this->call('GET', 'api/users/find', ['query' => 'janedoe']);
 
         $this->assertEquals(200, $successPseudo->status());
-        $this->assertEquals($user->toJson(), $successPseudo->content());
         $this->assertEquals(200, $successEmail->status());
-        $this->assertEquals($user->toJson(), $successEmail->content());
         $this->assertEquals(404, $failure->status());
     }
 
@@ -163,7 +161,6 @@ class UserControllerTest extends TestCase
         $response = $this->actingAs($user)->call('GET', 'api/users/current');
 
         $this->assertEquals(200, $response->status());
-        $this->assertEquals($user->toJson(), $response->content());
     }
 
     /**
