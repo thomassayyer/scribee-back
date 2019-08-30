@@ -45,6 +45,6 @@ class TextController extends Controller
         $text->user_pseudo = $request->user()->pseudo;
         $text->save();
 
-        return response($text, 201);
+        return response($text->load([ 'community', 'user' ]), 201);
     }
 }

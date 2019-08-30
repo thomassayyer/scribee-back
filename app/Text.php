@@ -25,6 +25,13 @@ class Text extends Model
     ];
 
     /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
+    protected $touches = ['community'];
+
+    /**
      * The author of the text.
      */
     public function user()

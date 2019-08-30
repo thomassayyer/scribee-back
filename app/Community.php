@@ -56,4 +56,12 @@ class Community extends Model
             $model->created_at = $model->freshTimestamp();
         });
     }
+
+    /**
+     * The texts published in the community.
+     */
+    public function texts()
+    {
+        return $this->hasMany(Text::class);
+    }
 }

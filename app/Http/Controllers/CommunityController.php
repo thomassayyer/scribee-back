@@ -36,7 +36,7 @@ class CommunityController extends Controller
      */
     public function show(Request $request, $pseudo)
     {
-        return Community::findOrFail($pseudo);
+        return Community::with('texts')->findOrFail($pseudo);
     }
 
     /**
