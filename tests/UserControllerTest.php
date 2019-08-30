@@ -140,9 +140,11 @@ class UserControllerTest extends TestCase
             'api_token' => 'token',
         ]);
 
-        $response = $this->actingAs($user)->call('DELETE', 'api/users/token');
+        $guestFailure = $this->call('DELETE', 'api/users/token');
+        $success = $this->actingAs($user)->call('DELETE', 'api/users/token');
 
-        $this->assertEquals(200, $response->status());
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
         $this->seeInDatabase('users', [
             'pseudo' => 'johndoe',
             'api_token' => null,
@@ -158,9 +160,11 @@ class UserControllerTest extends TestCase
     {
         $user = factory(App\User::class)->create();
 
-        $response = $this->actingAs($user)->call('GET', 'api/users/current');
+        $guestFailure = $this->call('GET', 'api/users/current');
+        $success = $this->actingAs($user)->call('GET', 'api/users/current');
 
-        $this->assertEquals(200, $response->status());
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
     }
 
     /**

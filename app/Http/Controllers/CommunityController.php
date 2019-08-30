@@ -29,6 +29,17 @@ class CommunityController extends Controller
     }
 
     /**
+     * Display a community.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Request $request, $pseudo)
+    {
+        return Community::findOrFail($pseudo);
+    }
+
+    /**
      * Search for one or more communities by pseudo or name.
      * 
      * @param  \Illuminate\Http\Request  $request

@@ -31,6 +31,28 @@ class CommunityControllerTest extends TestCase
     }
 
     /**
+     * Test the behavior of performing a GET HTTP request to /api/communities/{pseudo}.
+     *
+     * @return void
+     */
+    public function testShow()
+    {
+        $user = factory(App\User::class)->create();
+        $community = factory(App\Community::class)->create([
+            'pseudo' => 'lorem',
+        ]);
+
+        $guestFailure = $this->call('GET', 'api/communities/lorem');
+        $this->actingAs($user);
+        $success = $this->call('GET', 'api/communities/lorem');
+        $failure = $this->call('GET', 'api/communities/ipsum');
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
+        $this->assertEquals(404, $failure->status());
+    }
+
+    /**
      * Test the behavior of performing a GET HTTP request to /api/communities/search.
      *
      * @return void
@@ -50,7 +72,6 @@ class CommunityControllerTest extends TestCase
         });
 
         $guestFailure = $this->call('GET', 'api/communities/search', ['query' => 'lor']);
-
         $this->actingAs($user);
         $successPseudo = $this->call('GET', 'api/communities/search', ['query' => 'lor']);
         $successName = $this->call('GET', 'api/communities/search', ['query' => 'Lorem ips']);
