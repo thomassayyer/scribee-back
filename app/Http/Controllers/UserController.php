@@ -164,5 +164,7 @@ class UserController extends Controller
         }
 
         $request->user()->delete();
+
+        return response('User destroyed!');
     }
 }

@@ -143,4 +143,82 @@ class CommunityControllerTest extends TestCase
             'description' => 'Lorem ipsum dolor sit amet.',
         ]);
     }
+
+    /**
+     * Test the behavior of performing a PATCH HTTP request to /api/communities/{pseudo}.
+     * 
+     * @return void
+     */
+    public function testUpdate()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        $community = factory(App\Community::class)->create([
+            'pseudo' => 'lorem',
+            'name' => 'Lorem ipsum',
+            'description' => 'Lorem ipsum dolor sit amet.',
+            'user_pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class)->create([
+            'pseudo' => 'ipsum',
+        ]);
+
+        $guestFailure = $this->call('PATCH', 'api/communities/lorem');
+
+        $this->actingAs($user);
+
+        $notOwnCommunity = $this->call('PATCH', 'api/communities/ipsum');
+        $communityNotFound = $this->call('PATCH', 'api/communities/dolor');
+        $wrongDescription = $this->call('PATCH', 'api/communities/lorem', [
+            'description' => Str::random(50000),
+        ]);
+        $success = $this->call('PATCH', 'api/communities/lorem', [
+            'name' => 'Ipsum dolor',
+            'description' => 'Suspendisse vitae pharetra leo.',
+        ]);
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(401, $notOwnCommunity->status());
+        $this->assertEquals(404, $communityNotFound->status());
+        $this->assertEquals(422, $wrongDescription->status());
+        $this->assertEquals(200, $success->status());
+        $this->seeInDatabase('communities', [
+            'pseudo' => 'lorem',
+            'name' => 'Ipsum dolor',
+            'description' => 'Suspendisse vitae pharetra leo.',
+        ]);
+    }
+
+    /**
+     * Test the behavior of performing a DELETE HTTP request to /api/communities/{pseudo}.
+     * 
+     * @return void
+     */
+    public function testDestroy()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class)->create([
+            'pseudo' => 'lorem',
+            'user_pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class)->create([
+            'pseudo' => 'ipsum',
+        ]);
+
+        $guestFailure = $this->call('DELETE', 'api/communities/lorem');
+
+        $this->actingAs($user);
+
+        $communityNotFound = $this->call('DELETE', 'api/communities/dolor');
+        $notOwnCommunity = $this->call('DELETE', 'api/communities/ipsum');
+        $success = $this->call('DELETE', 'api/communities/lorem');
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(404, $communityNotFound->status());
+        $this->assertEquals(401, $notOwnCommunity->status());
+        $this->assertEquals(200, $success->status());
+    }
 }

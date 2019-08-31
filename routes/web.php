@@ -30,6 +30,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->post('/', 'CommunityController@create');
         $router->get('/', 'CommunityController@index');
         $router->get('{pseudo}', 'CommunityController@show');
+        $router->delete('{pseudo}', 'CommunityController@destroy');
+        $router->patch('{pseudo}', 'CommunityController@update');
     });
     $router->group(['prefix' => 'texts'], function () use ($router) {
         $router->get('/', 'TextController@index');

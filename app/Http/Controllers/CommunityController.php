@@ -32,6 +32,7 @@ class CommunityController extends Controller
      * Display a community.
      * 
      * @param  \Illuminate\Http\Request  $request
+     * @param  string  $pseudo
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, $pseudo)
@@ -80,5 +81,58 @@ class CommunityController extends Controller
         $community->save();
 
         return response($community, 201);
+    }
+
+    /**
+     * Update a community.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $pseudo
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $pseudo)
+    {
+        $this->validate($request, [
+            'name' => 'string',
+            'description' => 'string|max:40000',
+        ]);
+
+        $community = Community::findOrFail($pseudo);
+
+        if ($community->user_pseudo !== $request->user()->pseudo) {
+            return response('This community is not yours!', 401);
+        }
+
+        if ($request->has('name')) {
+            $community->name = $request->input('name');
+        }
+
+        if ($request->has('description')) {
+            $community->description = $request->input('description');
+        }
+
+        $community->save();
+
+        return $community;
+    }
+
+    /**
+     * Destroy a community.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $pseudo
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request, $pseudo)
+    {
+        $community = Community::findOrFail($pseudo);
+        
+        if ($community->user_pseudo !== $request->user()->pseudo) {
+            return response('This community is not yours!', 401);
+        }
+
+        $community->delete();
+
+        return response('Community destroyed!');
     }
 }
