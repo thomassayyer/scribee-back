@@ -71,6 +71,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function texts()
     {
-        return $this->hasMany(Text::class);
+        return $this->hasMany(Text::class)->orderBy('updated_at', 'desc');
     }
 }
