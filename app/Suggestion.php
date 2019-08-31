@@ -12,7 +12,7 @@ class Suggestion extends Model
      * @var array
      */
     protected $fillable = [
-        'suggestion', 'row', 'column', 'text_id'
+        'suggestion', 'start', 'end', 'text_id'
     ];
 
     /**
