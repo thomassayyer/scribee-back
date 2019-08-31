@@ -18,10 +18,12 @@ class CreateSuggestionsTable extends Migration
             $table->string('suggestion');
             $table->integer('row');
             $table->integer('column');
-            $table->boolean('accepted');
-            $table->unsignedBigInteger('review_id');
+            $table->boolean('accepted')->default(false);
+            $table->unsignedBigInteger('text_id');
+            $table->string('user_pseudo');
             $table->timestamps();
-            $table->foreign('review_id')->references('id')->on('reviews')->onDelete('cascade');
+            $table->foreign('text_id')->references('id')->on('texts')->onDelete('cascade');
+            $table->foreign('user_pseudo')->references('pseudo')->on('users')->onDelete('cascade');
         });
     }
 

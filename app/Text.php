@@ -21,7 +21,7 @@ class Text extends Model
      * @var array
      */
     protected $with = [
-        'user', 'community'
+        'user', 'community', 'suggestions'
     ];
 
     /**
@@ -45,5 +45,13 @@ class Text extends Model
     public function community()
     {
         return $this->belongsTo(Community::class);
+    }
+
+    /**
+     * The suggestions that has been made on the text.
+     */
+    public function suggestions()
+    {
+        return $this->hasMany(Suggestion::class);
     }
 }

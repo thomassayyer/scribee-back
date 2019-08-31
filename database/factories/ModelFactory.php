@@ -36,11 +36,3 @@ $factory->define(App\Text::class, function (Faker\Generator $faker) {
         'user_pseudo' => factory(App\User::class)->create()->pseudo,
     ];
 });
-
-$factory->define(App\Review::class, function (Faker\Generator $faker) {
-    return [
-        'done' => $faker->boolean,
-        'user_pseudo' => factory(App\User::class)->create()->pseudo,
-        'text_id' => factory(App\Text::class)->create()->id,
-    ];
-});

@@ -37,7 +37,4 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('/', 'TextController@index');
         $router->post('/', 'TextController@create');
     });
-    $router->group(['prefix' => 'reviews'], function () use ($router) {
-        //
-    });
 });
