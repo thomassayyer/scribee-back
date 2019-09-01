@@ -18,7 +18,6 @@ class CreateSuggestionsTable extends Migration
             $table->string('suggestion');
             $table->integer('start');
             $table->integer('end');
-            $table->boolean('accepted')->default(false);
             $table->unsignedBigInteger('text_id');
             $table->string('user_pseudo');
             $table->timestamps();
