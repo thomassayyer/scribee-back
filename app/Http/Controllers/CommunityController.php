@@ -100,7 +100,7 @@ class CommunityController extends Controller
         $community = Community::findOrFail($pseudo);
 
         if ($community->user_pseudo !== $request->user()->pseudo) {
-            return response('This community is not yours!', 401);
+            return response('The community is not yours!', 401);
         }
 
         if ($request->has('name')) {
@@ -128,7 +128,7 @@ class CommunityController extends Controller
         $community = Community::findOrFail($pseudo);
         
         if ($community->user_pseudo !== $request->user()->pseudo) {
-            return response('This community is not yours!', 401);
+            return response('The community is not yours!', 401);
         }
 
         $community->delete();

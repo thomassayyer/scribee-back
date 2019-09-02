@@ -2,6 +2,7 @@
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Event;
 
 class TextControllerTest extends TestCase
 {
@@ -75,59 +76,53 @@ class TextControllerTest extends TestCase
     }
 
     /**
-     * Test the behavior of performing a POST HTTP request to /api/texts/{id}/suggestions.
-     *
+     * Test the behavior of performing a PATCH HTTP request to /api/texts/{textId}/suggestions/{suggestionId}.
+     * 
      * @return void
      */
-    public function testCreateSuggestions()
+    public function testAcceptSuggestion()
     {
         $user = factory(App\User::class)->create([
             'pseudo' => 'johndoe',
         ]);
-        $text = factory(App\Text::class)->create([
+        factory(App\Text::class)->create([
             'id' => 1,
-        ]);
-
-        $guestFailure = $this->call('POST', 'api/texts/1/suggestions', [
-            'suggestions' => [
-                [ 'original' => 'lorem', 'suggestion' => 'ipsum' ],
-                [ 'original' => 'dolor', 'suggestion' => 'sit' ],
-            ],
-        ]);
-
-        $this->actingAs($user);
-        $wrongSuggestions = $this->call('POST', 'api/texts/2/suggestions', [
-            'suggestions' => 'lorem',
-        ]);
-        $textNotFound = $this->call('POST', 'api/texts/2/suggestions', [
-            'suggestions' => [
-                [ 'original' => 'lorem', 'suggestion' => 'ipsum' ],
-                [ 'original' => 'dolor', 'suggestion' => 'sit' ],
-            ],
-        ]);
-        $success = $this->call('POST', 'api/texts/1/suggestions', [
-            'suggestions' => [
-                [ 'original' => 'lorem', 'suggestion' => 'ipsum' ],
-                [ 'original' => 'dolor', 'suggestion' => 'sit' ],
-            ],
-        ]);
-
-        $this->assertEquals(401, $guestFailure->status());
-        $this->assertEquals(422, $wrongSuggestions->status());
-        $this->assertEquals(404, $textNotFound->status());
-        $this->assertEquals(201, $success->status());
-        $this->seeInDatabase('suggestions', [
+            'user_pseudo' => 'johndoe',
+        ])->suggestions()->create([
             'original' => 'lorem',
             'suggestion' => 'ipsum',
-            'text_id' => 1,
             'user_pseudo' => 'johndoe',
         ]);
-        $this->seeInDatabase('suggestions', [
+        factory(App\Text::class)->create([
+            'id' => 2,
+        ])->suggestions()->create([
+            'id' => 2,
             'original' => 'dolor',
             'suggestion' => 'sit',
-            'text_id' => 1,
             'user_pseudo' => 'johndoe',
         ]);
+
+        Event::fake();
+
+        $guestFailure = $this->call('PATCH', 'api/texts/1/suggestions/1');
+
+        $this->actingAs($user);
+
+        $suggestionNotFound = $this->call('PATCH', 'api/texts/1/suggestions/3');
+        $textNotFound = $this->call('PATCH', 'api/texts/3/suggestions/1');
+        $wrongSuggestion = $this->call('PATCH', 'api/texts/1/suggestions/2');
+        $notOwnText = $this->call('PATCH', 'api/texts/2/suggestions/2');
+        $success = $this->call('PATCH', 'api/texts/1/suggestions/1');
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(404, $suggestionNotFound->status());
+        $this->assertEquals(404, $textNotFound->status());
+        $this->assertEquals(400, $wrongSuggestion->status());
+        $this->assertEquals(401, $notOwnText->status());
+        $this->assertEquals(200, $success->status());
+        Event::assertDispatched(App\Events\SuggestionAccepted::class, function ($event) {
+            return $event->suggestion->id === 1;
+        });
     }
 
     /**
