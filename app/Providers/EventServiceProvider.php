@@ -14,6 +14,10 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         'App\Events\SuggestionAccepted' => [
             'App\Listeners\DestroySuggestion',
+            'App\Listeners\DecrementUserScore',
         ],
+        'App\Events\SuggestionsCreated' => [
+            'App\Listeners\IncrementUserScore',
+        ]
     ];
 }

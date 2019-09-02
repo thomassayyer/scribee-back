@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\SuggestionAccepted;
 
-class DestroySuggestion
+class DecrementUserScore
 {
     /**
      * Handle the event.
@@ -14,6 +14,7 @@ class DestroySuggestion
      */
     public function handle(SuggestionAccepted $event)
     {
-        $event->suggestion->delete();
+        $event->user->score--;
+        $event->user->save();
     }
 }

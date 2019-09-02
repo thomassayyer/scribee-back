@@ -84,17 +84,24 @@ class TextControllerTest extends TestCase
     {
         $user = factory(App\User::class)->create([
             'pseudo' => 'johndoe',
+            'score' => 5,
         ]);
         factory(App\Text::class)->create([
             'id' => 1,
             'user_pseudo' => 'johndoe',
         ])->suggestions()->create([
+            'id' => 1,
             'original' => 'lorem',
             'suggestion' => 'ipsum',
             'user_pseudo' => 'johndoe',
         ]);
+        $userWithNoScore = factory(App\User::class)->create([
+            'pseudo' => 'janedoe',
+            'score' => 0,
+        ]);
         factory(App\Text::class)->create([
             'id' => 2,
+            'user_pseudo' => 'janedoe',
         ])->suggestions()->create([
             'id' => 2,
             'original' => 'dolor',
@@ -113,6 +120,7 @@ class TextControllerTest extends TestCase
         $wrongSuggestion = $this->call('PATCH', 'api/texts/1/suggestions/2');
         $notOwnText = $this->call('PATCH', 'api/texts/2/suggestions/2');
         $success = $this->call('PATCH', 'api/texts/1/suggestions/1');
+        $scoreTooLow = $this->actingAs($userWithNoScore)->call('PATCH', 'api/texts/2/suggestions/2');
 
         $this->assertEquals(401, $guestFailure->status());
         $this->assertEquals(404, $suggestionNotFound->status());
@@ -120,8 +128,9 @@ class TextControllerTest extends TestCase
         $this->assertEquals(400, $wrongSuggestion->status());
         $this->assertEquals(401, $notOwnText->status());
         $this->assertEquals(200, $success->status());
+        $this->assertEquals(401, $scoreTooLow->status());
         Event::assertDispatched(App\Events\SuggestionAccepted::class, function ($event) {
-            return $event->suggestion->id === 1;
+            return $event->suggestion->id === 1 && $event->user->pseudo === 'johndoe';
         });
     }
 

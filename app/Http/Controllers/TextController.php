@@ -60,6 +60,10 @@ class TextController extends Controller
      */
     public function acceptSuggestion(Request $request, $textId, $suggestionId)
     {
+        if ($request->user()->score === 0) {
+            return response('Your score is too low!', 401);
+        }
+        
         $suggestion = Suggestion::findOrFail($suggestionId);
         $text = Text::findOrFail($textId);
 
@@ -74,7 +78,7 @@ class TextController extends Controller
         $text->text = str_replace($suggestion->original, $suggestion->suggestion, $text->text);
         $text->save();
         
-        event(new SuggestionAccepted($suggestion));
+        event(new SuggestionAccepted($suggestion, $request->user()));
 
         return response($text->text);
     }

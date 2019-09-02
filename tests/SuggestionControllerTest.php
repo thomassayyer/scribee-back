@@ -1,6 +1,7 @@
 <?php
 
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Event;
 
 class SuggestionControllerTest extends TestCase
 {
@@ -19,6 +20,8 @@ class SuggestionControllerTest extends TestCase
         factory(App\Text::class)->create([
             'id' => 1,
         ]);
+
+        Event::fake();
 
         $guestFailure = $this->call('POST', 'api/texts/1/suggestions', [
             'suggestions' => [
@@ -60,6 +63,9 @@ class SuggestionControllerTest extends TestCase
             'text_id' => 1,
             'user_pseudo' => 'johndoe',
         ]);
+        Event::assertDispatched(App\Events\SuggestionsCreated::class, function ($event) {
+            return $event->suggestions->count() === 2 && $event->user->pseudo === 'johndoe';
+        });
     }
 
     /**

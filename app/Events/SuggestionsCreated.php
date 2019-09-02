@@ -3,19 +3,18 @@
 namespace App\Events;
 
 use App\User;
-use App\Suggestion;
 use Illuminate\Queue\SerializesModels;
 
-class SuggestionAccepted extends Event
+class SuggestionsCreated extends Event
 {
     use SerializesModels;
 
     /**
-     * The suggestion that has been accepted.
+     * The suggestions that has been created.
      * 
-     * @var /App/Suggestion
+     * @var /Illuminate/Database/Eloquent/Collection
      */
-    public $suggestion;
+    public $suggestions;
 
     /**
      * The user who created the suggestions.
@@ -27,13 +26,13 @@ class SuggestionAccepted extends Event
     /**
      * Create a new event instance.
      * 
-     * @param  /App/Suggestion  $suggestion
+     * @param  /Illuminate/Database/Eloquent/Collection  $suggestions
      * @param  /App/User  $user
      * @return void
      */
-    public function __construct(Suggestion $suggestion, User $user)
+    public function __construct($suggestions, User $user)
     {
-        $this->suggestion = $suggestion;
+        $this->suggestions = $suggestions;
         $this->user = $user;
     }
 }

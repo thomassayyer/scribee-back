@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Text;
 use App\Suggestion;
+use App\Events\SuggestionsCreated;
 use Illuminate\Http\Request;
 
 class SuggestionController extends Controller
@@ -37,6 +38,8 @@ class SuggestionController extends Controller
         }
 
         $created = Text::findOrFail($textId)->suggestions()->createMany($suggestions);
+
+        event(new SuggestionsCreated($created, $request->user()));
 
         return response($created->load('user'), 201);
     }

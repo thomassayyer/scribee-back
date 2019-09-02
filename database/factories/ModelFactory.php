@@ -36,3 +36,12 @@ $factory->define(App\Text::class, function (Faker\Generator $faker) {
         'user_pseudo' => factory(App\User::class)->create()->pseudo,
     ];
 });
+
+$factory->define(App\Suggestion::class, function (Faker\Generator $faker) {
+    return [
+        'original' => $faker->text,
+        'suggestion' => $faker->text,
+        'text_id' => factory(App\Text::class)->create()->id,
+        'user_pseudo' => factory(App\User::class)->create()->pseudo,
+    ];
+});
