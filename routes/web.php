@@ -36,5 +36,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'texts'], function () use ($router) {
         $router->get('/', 'TextController@index');
         $router->post('/', 'TextController@create');
+        $router->delete('{id}', 'TextController@destroy');
+        $router->post('{id}/suggestions', 'TextController@createSuggestions');
     });
 });

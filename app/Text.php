@@ -12,7 +12,7 @@ class Text extends Model
      * @var array
      */
     protected $fillable = [
-        'text', 'community_pseudo'
+        'text', 'community_pseudo', 'user_pseudo'
     ];
 
     /**

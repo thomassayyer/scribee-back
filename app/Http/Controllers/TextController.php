@@ -47,4 +47,47 @@ class TextController extends Controller
 
         return response($text->load([ 'community', 'user', 'suggestions' ]), 201);
     }
+
+    /**
+     * Create and assign new suggestions to text.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  integer  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function createSuggestions(Request $request, $id)
+    {
+        $this->validate($request, [
+            'suggestions' => 'required|array',
+        ]);
+
+        $suggestions = $request->input('suggestions');
+        foreach ($suggestions as &$suggestion) {
+            $suggestion['user_pseudo'] = $request->user()->pseudo;   
+        }
+
+        $created = Text::findOrFail($id)->suggestions()->createMany($suggestions);
+
+        return response($created, 201);
+    }
+
+    /**
+     * Destroy a text.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @param  integer  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request, $id)
+    {
+        $text = Text::findOrFail($id);
+        
+        if ($text->user_pseudo !== $request->user()->pseudo) {
+            return response('This text is not yours!', 401);
+        }
+
+        $text->delete();
+
+        return response('Text destroyed!');
+    }
 }

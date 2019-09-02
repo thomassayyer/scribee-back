@@ -12,7 +12,16 @@ class Suggestion extends Model
      * @var array
      */
     protected $fillable = [
-        'suggestion', 'start', 'end', 'text_id'
+        'original', 'suggestion', 'text_id', 'user_pseudo'
+    ];
+
+    /**
+     * The relations to eager load on every query.
+     *
+     * @var array
+     */
+    protected $with = [
+        'user'
     ];
 
     /**
@@ -21,6 +30,14 @@ class Suggestion extends Model
      * @var array
      */
     protected $touches = ['text'];
+
+    /**
+     * The user who made the suggestion.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * The text that the suggestion has been made on.
