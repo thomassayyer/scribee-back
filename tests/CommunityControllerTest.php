@@ -168,6 +168,73 @@ class CommunityControllerTest extends TestCase
     }
 
     /**
+     * Test the behavior of performing a GET HTTP request to /api/communities/latests.
+     *
+     * @return void
+     */
+    public function testShowLatests()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class, 20)->create([
+            'name' => 'Lorem',
+        ]);
+        factory(App\Community::class, 20)->create([
+            'name' => 'Ipsum',
+            'created_at' => Carbon::now()->startOfYear(),
+        ]);
+
+        $guestFailure = $this->call('GET', 'api/communities/latests');
+        $this->actingAs($user);
+        $success = $this->call('GET', 'api/communities/latests');
+
+        $returnedCollections = json_decode($success->content());
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
+        $this->assertEquals(10, count($returnedCollections));
+        foreach ($returnedCollections as $collection) {
+            $this->assertEquals('Lorem', $collection->name);
+        }
+    }
+
+    /**
+     * Test the behavior of performing a GET HTTP request to /api/communities/popular.
+     *
+     * @return void
+     */
+    public function testShowPopular()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class, 20)->create([
+            'name' => 'Lorem',
+        ])->each(function ($community) {
+            $community->texts()->createMany([
+                [ 'text' => Str::random(20), 'user_pseudo' => 'johndoe' ],
+            ]);
+        });
+        factory(App\Community::class, 20)->create([
+            'name' => 'Ipsum',
+        ]);
+
+        $guestFailure = $this->call('GET', 'api/communities/popular');
+        $this->actingAs($user);
+        $success = $this->call('GET', 'api/communities/popular');
+
+        $returnedCollections = json_decode($success->content());
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
+        $this->assertEquals(10, count($returnedCollections));
+        foreach ($returnedCollections as $collection) {
+            $this->assertEquals('Lorem', $collection->name);
+        }
+    }
+
+    /**
      * Test the behavior of performing a GET HTTP request to /api/communities/search.
      *
      * @return void

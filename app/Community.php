@@ -28,13 +28,6 @@ class Community extends Model
     protected $keyType = 'string';
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -42,20 +35,6 @@ class Community extends Model
     protected $fillable = [
         'pseudo', 'name', 'description', 'user_pseudo'
     ];
-
-    /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            $model->created_at = $model->freshTimestamp();
-        });
-    }
 
     /**
      * The texts published in the community.

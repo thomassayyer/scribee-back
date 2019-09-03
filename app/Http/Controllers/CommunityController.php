@@ -54,7 +54,7 @@ class CommunityController extends Controller
             'texts' => function(Builder $query) {
                 $query->where('updated_at', '>=', Carbon::now()->toDateString());
             },
-        ])->orderBy('texts_count', 'desc')->first();
+        ])->latest('texts_count')->first();
     }
 
     /**
@@ -69,7 +69,7 @@ class CommunityController extends Controller
             'texts' => function(Builder $query) {
                 $query->where('updated_at', '>=', Carbon::now()->startOfWeek()->toDateString());
             },
-        ])->orderBy('texts_count', 'desc')->first();
+        ])->latest('texts_count')->first();
     }
 
     /**
@@ -84,7 +84,29 @@ class CommunityController extends Controller
             'texts' => function(Builder $query) {
                 $query->where('updated_at', '>=', Carbon::now()->startOfMonth()->toDateString());
             },
-        ])->orderBy('texts_count', 'desc')->first();
+        ])->latest('texts_count')->first();
+    }
+
+    /**
+     * Display the latest communities.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showLatests(Request $request)
+    {
+        return Community::latest()->take(10)->get();
+    }
+
+    /**
+     * Display the lately updated communities.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showPopular(Request $request)
+    {
+        return Community::withCount('texts')->latest('texts_count')->take(10)->get();
     }
 
     /**

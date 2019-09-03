@@ -32,6 +32,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('/daily', 'CommunityController@showDaily');
         $router->get('/weekly', 'CommunityController@showWeekly');
         $router->get('/monthly', 'CommunityController@showMonthly');
+        $router->get('/latests', 'CommunityController@showLatests');
+        $router->get('/popular', 'CommunityController@showPopular');
         $router->get('{pseudo}', 'CommunityController@show');
         $router->delete('{pseudo}', 'CommunityController@destroy');
         $router->patch('{pseudo}', 'CommunityController@update');
