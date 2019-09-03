@@ -17,6 +17,7 @@ class TextController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('score', [ 'only' => 'acceptSuggestion' ]);
     }
 
     /**
@@ -59,11 +60,7 @@ class TextController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function acceptSuggestion(Request $request, $textId, $suggestionId)
-    {
-        if ($request->user()->score === 0) {
-            return response('Your score is too low!', 401);
-        }
-        
+    {   
         $suggestion = Suggestion::findOrFail($suggestionId);
         $text = Text::findOrFail($textId);
 
