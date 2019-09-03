@@ -25,4 +25,8 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value="database.testing"/>
     </php>
+    <logging>
+        <log type="coverage-clover" target="./tests/coverage.xml"/>
+        <log type="junit" target="./tests/tests.xml"/>
+    </logging>
 </phpunit>
