@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Illuminate\Support\Str;
 
@@ -17,7 +18,7 @@ class CommunityControllerTest extends TestCase
         $user = factory(App\User::class)->create([
             'pseudo' => 'johndoe',
         ]);
-        $texts = factory(App\Community::class, 5)->create([
+        factory(App\Community::class, 5)->create([
             'user_pseudo' => 'johndoe',
         ]);
         factory(App\Community::class, 5)->create();
@@ -38,18 +39,132 @@ class CommunityControllerTest extends TestCase
     public function testShow()
     {
         $user = factory(App\User::class)->create();
-        $community = factory(App\Community::class)->create([
+        factory(App\Community::class)->create([
             'pseudo' => 'lorem',
         ]);
 
         $guestFailure = $this->call('GET', 'api/communities/lorem');
         $this->actingAs($user);
+        $notFound = $this->call('GET', 'api/communities/ipsum');
         $success = $this->call('GET', 'api/communities/lorem');
-        $failure = $this->call('GET', 'api/communities/ipsum');
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(404, $notFound->status());
+        $this->assertEquals(200, $success->status());
+    }
+
+    /**
+     * Test the behavior of performing a GET HTTP request to /api/communities/daily.
+     *
+     * @return void
+     */
+    public function testShowDaily()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class)->create([
+            'pseudo' => 'lorem',
+        ])->texts()->createMany([
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe' ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe' ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe' ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+        ]);
+        factory(App\Community::class, 2)->create()->each(function (App\Community $community) {
+            $community->texts()->createMany([
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe' ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+            ]);
+        });
+
+        $guestFailure = $this->call('GET', 'api/communities/daily');
+        $this->actingAs($user);
+        $success = $this->call('GET', 'api/communities/daily');
 
         $this->assertEquals(401, $guestFailure->status());
         $this->assertEquals(200, $success->status());
-        $this->assertEquals(404, $failure->status());
+        $this->assertEquals('lorem', json_decode($success->content())->pseudo);
+    }
+
+    /**
+     * Test the behavior of performing a GET HTTP request to /api/communities/weekly.
+     *
+     * @return void
+     */
+    public function testShowWeekly()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class)->create([
+            'pseudo' => 'lorem',
+        ])->texts()->createMany([
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+        ]);
+        factory(App\Community::class, 2)->create()->each(function (App\Community $community) {
+            $community->texts()->createMany([
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+            ]);
+        });
+
+        $guestFailure = $this->call('GET', 'api/communities/weekly');
+        $this->actingAs($user);
+        $success = $this->call('GET', 'api/communities/weekly');
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
+        $this->assertEquals('lorem', json_decode($success->content())->pseudo);
+    }
+
+    /**
+     * Test the behavior of performing a GET HTTP request to /api/communities/monthly.
+     *
+     * @return void
+     */
+    public function testShowMonthly()
+    {
+        $user = factory(App\User::class)->create([
+            'pseudo' => 'johndoe',
+        ]);
+        factory(App\Community::class)->create([
+            'pseudo' => 'lorem',
+        ])->texts()->createMany([
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+            [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+        ]);
+        factory(App\Community::class, 2)->create()->each(function (App\Community $community) {
+            $community->texts()->createMany([
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfWeek() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+                [ 'text' => Str::random(50), 'user_pseudo' => 'johndoe', 'updated_at' => Carbon::now()->startOfMonth() ],
+            ]);
+        });
+
+        $guestFailure = $this->call('GET', 'api/communities/monthly');
+        $this->actingAs($user);
+        $success = $this->call('GET', 'api/communities/monthly');
+
+        $this->assertEquals(401, $guestFailure->status());
+        $this->assertEquals(200, $success->status());
+        $this->assertEquals('lorem', json_decode($success->content())->pseudo);
     }
 
     /**
@@ -60,7 +175,7 @@ class CommunityControllerTest extends TestCase
     public function testSearch()
     {
         $user = factory(App\User::class)->create();
-        $community = factory(App\Community::class)->create([
+        factory(App\Community::class)->create([
             'pseudo' => 'lorem',
             'name' => 'Lorem ipsum',
         ]);
@@ -154,7 +269,7 @@ class CommunityControllerTest extends TestCase
         $user = factory(App\User::class)->create([
             'pseudo' => 'johndoe',
         ]);
-        $community = factory(App\Community::class)->create([
+        factory(App\Community::class)->create([
             'pseudo' => 'lorem',
             'name' => 'Lorem ipsum',
             'description' => 'Lorem ipsum dolor sit amet.',

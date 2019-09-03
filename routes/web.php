@@ -29,6 +29,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('search', 'CommunityController@search');
         $router->post('/', 'CommunityController@create');
         $router->get('/', 'CommunityController@index');
+        $router->get('/daily', 'CommunityController@showDaily');
+        $router->get('/weekly', 'CommunityController@showWeekly');
+        $router->get('/monthly', 'CommunityController@showMonthly');
         $router->get('{pseudo}', 'CommunityController@show');
         $router->delete('{pseudo}', 'CommunityController@destroy');
         $router->patch('{pseudo}', 'CommunityController@update');

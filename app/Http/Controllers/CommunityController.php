@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Community;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 
 class CommunityController extends Controller
 {
@@ -38,6 +40,51 @@ class CommunityController extends Controller
     public function show(Request $request, $pseudo)
     {
         return Community::with('texts')->findOrFail($pseudo);
+    }
+
+    /**
+     * Display the community of the day.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showDaily(Request $request)
+    {
+        return Community::withCount([
+            'texts' => function(Builder $query) {
+                $query->where('updated_at', '>=', Carbon::now()->toDateString());
+            },
+        ])->orderBy('texts_count', 'desc')->first();
+    }
+
+    /**
+     * Display the community of the week.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showWeekly(Request $request)
+    {
+        return Community::withCount([
+            'texts' => function(Builder $query) {
+                $query->where('updated_at', '>=', Carbon::now()->startOfWeek()->toDateString());
+            },
+        ])->orderBy('texts_count', 'desc')->first();
+    }
+
+    /**
+     * Display the community of the month.
+     * 
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function showMonthly(Request $request)
+    {
+        return Community::withCount([
+            'texts' => function(Builder $query) {
+                $query->where('updated_at', '>=', Carbon::now()->startOfMonth()->toDateString());
+            },
+        ])->orderBy('texts_count', 'desc')->first();
     }
 
     /**
