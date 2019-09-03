@@ -62,6 +62,6 @@ class Community extends Model
      */
     public function texts()
     {
-        return $this->hasMany(Text::class)->orderBy('updated_at', 'desc');
+        return $this->hasMany(Text::class)->latest('updated_at');
     }
 }
