@@ -200,11 +200,11 @@ class CommunityControllerTest extends TestCase
     }
 
     /**
-     * Test the behavior of performing a GET HTTP request to /api/communities/popular.
+     * Test the behavior of performing a GET HTTP request to /api/communities/populars.
      *
      * @return void
      */
-    public function testShowPopular()
+    public function testShowPopulars()
     {
         $user = factory(App\User::class)->create([
             'pseudo' => 'johndoe',
@@ -220,9 +220,9 @@ class CommunityControllerTest extends TestCase
             'name' => 'Ipsum',
         ]);
 
-        $guestFailure = $this->call('GET', 'api/communities/popular');
+        $guestFailure = $this->call('GET', 'api/communities/populars');
         $this->actingAs($user);
-        $success = $this->call('GET', 'api/communities/popular');
+        $success = $this->call('GET', 'api/communities/populars');
 
         $returnedCollections = json_decode($success->content());
 

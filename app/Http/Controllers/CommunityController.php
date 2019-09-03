@@ -104,7 +104,7 @@ class CommunityController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function showPopular(Request $request)
+    public function showPopulars(Request $request)
     {
         return Community::withCount('texts')->latest('texts_count')->take(10)->get();
     }
