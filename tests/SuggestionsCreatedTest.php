@@ -13,7 +13,7 @@ class SuggestionsCreatedTest extends TestCase
      * 
      * @return void
      */
-    public function testHandle()
+    public function test()
     {
         $user = factory(App\User::class)->create([
             'pseudo' => 'johndoe',

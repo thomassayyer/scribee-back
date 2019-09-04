@@ -15,6 +15,10 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+$router->get('test/auth', ['middleware' => 'auth', function (Illuminate\Http\Request $request) {
+    return $request->user();
+}]);
+
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'users'], function () use ($router) {
         $router->get('find', 'UserController@find');
